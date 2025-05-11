@@ -1,0 +1,167 @@
+package field
+
+import (
+	"9fans.net/go/draw"
+	"9fans.net/go/draw/memdraw"
+	//"fmt"
+	"image"
+	"log"
+	"sync"
+	"xui"
+	"xui/events"
+	"xui/events/keyboard"
+	"xui/events/mouse"
+	"xui/internal/color"
+	"xui/internal/font"
+	"xui/internal/geom"
+	"xui/layout"
+	"xui/space"
+)
+
+const (
+	Backspace rune = 8
+)
+
+type Interface interface {
+}
+
+type Field struct {
+	mu sync.RWMutex
+
+	Orig image.Point
+	image.Rectangle
+	x xui.Interface
+
+	Text string
+	color.Colorset
+
+	textImg *memdraw.Image
+	borderImg *memdraw.Image
+	hoverImg *memdraw.Image
+
+	hover bool
+
+	cb func(ev events.Interface, userData any)
+	cbUserData any
+
+	Margin space.Sp
+}
+
+func New(x xui.Interface, orig image.Point, text string, r image.Rectangle) (f *Field) {
+	f = &Field{}
+	f.Orig = orig
+	f.Text = text
+	f.Rectangle = r
+	f.x = x
+
+	f.Colorset.Normal.Border = color.Border
+	f.Colorset.Hover.Border = color.Hover.Border
+
+	return
+}
+
+func (f *Field) Event(ev events.Interface) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
+	switch tev := ev.(type) {
+	case mouse.Event:
+		if tev.Type == mouse.Enter {
+			f.hover = true
+		} else if tev.Type == mouse.Leave {
+			f.hover = false
+		}
+
+		if f.cb != nil {
+			f.cb(tev, f.cbUserData)
+		}
+	case keyboard.Event:
+		log.Printf("key pressed: %+v", tev)
+
+		switch tev.Key {
+		case Backspace:
+			if len(f.Text) > 0 {
+				f.Text = f.Text[:len(f.Text)-1]
+			}
+		default:
+			f.Text += string([]byte{byte(tev.Key)})
+		}
+		//log.Printf("event: call updateTextImgs")
+		f.updateTextImgs()
+	}
+}
+
+func (f *Field) Render() *memdraw.Image {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+
+	if f.borderImg == nil {
+		//log.Printf("render: call updateTextImgs")
+		f.updateTextImgs()
+	}
+
+	if f.hover {
+		return f.hoverImg
+	} else {
+		return f.borderImg
+	}
+}
+
+func (f *Field) updateTextImgs() {
+
+	var err error
+	//log.Printf("updateTextImgs: call font.String")
+	f.textImg, err = font.String(f.Text)
+	if err != nil {
+		panic(err.Error())
+	}
+	r := f.Rectangle//f.textImg.R.Intersect(f.Rectangle)
+
+	f.borderImg, err = memdraw.AllocImage(f.Rectangle.Inset(-f.x.Scale(5)).Add(f.x.Pt(5, 5)), draw.ABGR32)
+	if err != nil {
+		panic(err.Error())
+	}
+	memdraw.FillColor(f.borderImg, draw.Opaque)
+
+	f.hoverImg, err = memdraw.AllocImage(f.Rectangle.Inset(-f.x.Scale(5)).Add(f.x.Pt(5, 5)), draw.ABGR32)
+	if err != nil {
+		panic(err.Error())
+	}
+	memdraw.FillColor(f.hoverImg, draw.Opaque)
+
+	rr := r
+	rr.Min = r.Min.Add(f.x.Pt(3, 7))
+
+	f.borderImg.Draw(rr, f.textImg, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
+	geom.DrawRoundedBorder(f.borderImg, f.Rectangle, f.Colorset.Normal.Border)
+
+	f.hoverImg.Draw(rr, f.textImg, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
+	geom.DrawRoundedBorder(f.hoverImg, f.Rectangle, f.Colorset.Hover.Border)
+
+	geom.DrawCursor(f.hoverImg, r, f.textImg, f.Colorset.Hover.Border)
+}
+
+func (f Field) Focus() {
+}
+
+func (f Field) Layout() layout.Interface {
+	return layout.Inline{}
+}
+
+func (f *Field) Geom() (r image.Rectangle, margin space.Sp) {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+
+	if f.borderImg == nil {
+		//log.Printf("geom: call updateTextImgs")
+		f.updateTextImgs()
+	}
+	return f.borderImg.R, f.Margin
+}
+
+func (f *Field) SetCallback(cb func(ev events.Interface, userData any), userData any) {
+	f.cb = cb
+	f.cbUserData = userData
+}
+
+
