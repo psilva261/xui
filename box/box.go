@@ -5,6 +5,7 @@ import (
 	"9fans.net/go/draw/memdraw"
 	"image"
 	//"log"
+	"runtime"
 	"sync"
 	"xui/element"
 	"xui/events"
@@ -107,11 +108,16 @@ func (b *Box) Render() *memdraw.Image {
 	ims := make([]*memdraw.Image, len(b.Elements))
 	wg := sync.WaitGroup{}
 	for i, el := range b.Elements {
-		wg.Add(1)
-		go func(ii int) {
-			ims[ii] = el.Render() //b.boxImg, b.Rs[i].Min)
-			wg.Done()
-		}(i)
+		if runtime.GOARCH != "arm64" {
+			wg.Add(1)
+			go func(ii int) {
+				ims[ii] = el.Render() //b.boxImg, b.Rs[i].Min)
+				wg.Done()
+			}(i)
+		} else {
+			// otherwise every item can end up being the same element
+			ims[i] = el.Render() //b.boxImg, b.Rs[i].Min)
+		}
 	}
 	wg.Wait()
 
