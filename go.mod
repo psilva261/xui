@@ -1,4 +1,4 @@
-module xui
+module github.com/psilva261/xui
 
 go 1.22.0
 
