@@ -41,6 +41,8 @@ type Box struct {
 	Height int
 	color.Colorset
 
+	Background *memdraw.Image
+
 	Margin space.Sp
 	Border space.Sp
 	Padding space.Sp
@@ -198,6 +200,9 @@ func (b *Box) layoutBoxImg() {
 			b.boxImg.Draw(r, b.Colorset.Normal.Background, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
 		} else {
 			memdraw.FillColor(b.boxImg, draw.Transparent)
+		}
+		if b.Background != nil {
+			b.boxImg.Draw(r, b.Background, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
 		}
 	}
 }
