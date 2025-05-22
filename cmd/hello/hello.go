@@ -33,6 +33,12 @@ func Main() (err error) {
 
 	l := label.New(image.Point{10, 5}, "Hello, world!!") //, c)
 	l.Margin = space.New(5, 10)
+	l2 := label.New(image.Point{10, 5}, "Additional text!!") //, c)
+	l2.Margin = space.New(5, 10)
+	l3 := label.New(image.Point{10, 5}, "A really long subsequent text to fill the horizontal space!") //, c)
+	l3.Margin = space.New(5, 10)
+	l4 := label.New(image.Point{10, 5}, "Wrap into the next line for sure!!!") //, c)
+	l4.Margin = space.New(5, 10)
 
 	f, err := os.Open("animated-computer-image-0064.gif")
 	//f, err := os.Open("g3Ys.gif")
@@ -76,9 +82,19 @@ func Main() (err error) {
 
 	fl := field.New(x, image.ZP, " ", x.Rect(0,0, 150, 50))
 	fl.Margin = x.Space(5, 10)
-
+	b2 := box.New([]element.Interface{
+		l,
+		l2,
+		l3,
+		l4,
+	})
+	b2.Wrap = true
+	log.Printf("xui screen image width: %v", x.R().Dx())
+	b2.Width = x.R().Dx()/2
 	b := box.New([]element.Interface{
-		a, l, btn, fl,
+		a,
+		b2,
+		btn, fl,
 	})
 	//b.Dir = box.Horizontal
 	x.SetRoot(b)

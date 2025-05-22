@@ -108,7 +108,7 @@ func (b *Box) Render() *memdraw.Image {
 	ims := make([]*memdraw.Image, len(b.Elements))
 	wg := sync.WaitGroup{}
 	for i, el := range b.Elements {
-		if runtime.GOARCH != "arm64" {
+		if /* otherwise an error happens */false && runtime.GOARCH != "arm64" {
 			wg.Add(1)
 			go func(ii int) {
 				ims[ii] = el.Render() //b.boxImg, b.Rs[i].Min)
@@ -131,6 +131,10 @@ func (b *Box) Render() *memdraw.Image {
 	return b.boxImg
 }
 
+// Populate
+//
+// - b.Rs[i]
+// - b.boxImg
 func (b *Box) layoutBoxImg() {
 	// 0. Validations
 
@@ -140,15 +144,15 @@ func (b *Box) layoutBoxImg() {
 		rEl, marginEl := el.Geom()
 		b.Rs[i] = rEl.Add(dxy)
 		b.Rs[i] = b.Rs[i].Add(marginEl.TopLeft())
-		switch b.Dir {
-		case Horizontal:
+		switch {
+		case b.Dir == Horizontal || (b.Wrap && (b.Width == 0 || rEl.Dx()+dxy.X <= b.Width)):
 			//log.Printf("horiz.")
 			dxy = dxy.Add(image.Point{X: rEl.Dx()+marginEl.Left.Val})
 			if i > 0 {
 				_, marginLast := b.Elements[i-1].Geom()
 				dxy = dxy.Add(image.Point{X: marginLast.Right.Val})
 			}
-		case Vertical:
+		case b.Dir == Vertical:
 			//log.Printf("vert.")
 			fallthrough
 		default:
@@ -157,6 +161,7 @@ func (b *Box) layoutBoxImg() {
 				_, marginLast := b.Elements[i-1].Geom()
 				dxy = dxy.Add(image.Point{Y: marginLast.Bottom.Val})
 			}
+			dxy.X = 0
 		}
 	}
 
@@ -170,6 +175,17 @@ func (b *Box) layoutBoxImg() {
 				//Min: b.Rs[0].Min,
 				Max: b.Rs[len(b.Rs)-1].Max.Add(b.Rs[0].Min).
 				  Add(b.Padding.Size()),
+			}
+
+			// Expand outer rectangle if inner element rectangles don't fit
+			for _, el := range b.Elements {
+				rEl, _ := el.Geom()
+				if rEl.Dx() > r.Dx() {
+					r.Max.X += rEl.Dx()-r.Dx()
+				}
+				if rEl.Dy() > r.Dy() {
+					r.Max.X += rEl.Dy()-r.Dy()
+				}
 			}
 		}
 		// Allocate image
