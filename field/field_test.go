@@ -3,10 +3,10 @@ package field
 import (
 	"9fans.net/go/draw"
 	"9fans.net/go/draw/memdraw"
+	"github.com/psilva261/xui/events/keyboard"
+	"github.com/psilva261/xui/xuitest"
 	"image"
 	"testing"
-	"xui/events/keyboard"
-	"xui/xuitest"
 )
 
 func TestRender(t *testing.T) {

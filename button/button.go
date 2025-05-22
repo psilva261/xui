@@ -4,14 +4,14 @@ import (
 	"9fans.net/go/draw"
 	"9fans.net/go/draw/memdraw"
 	"image"
-	"xui"
-	"xui/events"
-	"xui/events/mouse"
-	"xui/internal/color"
-	"xui/internal/font"
-	"xui/internal/geom"
-	"xui/space"
-	"xui/layout"
+	"github.com/psilva261/xui"
+	"github.com/psilva261/xui/events"
+	"github.com/psilva261/xui/events/mouse"
+	"github.com/psilva261/xui/font"
+	"github.com/psilva261/xui/internal/color"
+	"github.com/psilva261/xui/internal/geom"
+	"github.com/psilva261/xui/space"
+	"github.com/psilva261/xui/layout"
 )
 
 type Interface interface {

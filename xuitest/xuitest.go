@@ -7,8 +7,8 @@ import (
 	"image/color"
 	"image/png"
 	"os"
-	"xui/element"
-	"xui/space"
+	"github.com/psilva261/xui/element"
+	"github.com/psilva261/xui/space"
 )
 
 type Xui struct {

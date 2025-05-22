@@ -5,7 +5,7 @@ import (
 	"image"
 	"image/color"
 	"testing"
-	"xui/xuitest"
+	"github.com/psilva261/xui/xuitest"
 )
 
 func TestRender(t *testing.T) {

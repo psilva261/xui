@@ -2,7 +2,7 @@ package space
 
 import (
 	"image"
-	"xui/space/offset"
+	"github.com/psilva261/xui/space/offset"
 )
 
 type Sp struct {

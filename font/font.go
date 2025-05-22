@@ -15,17 +15,29 @@ import (
 	imagedraw "image/draw"
 )
 
-func String(text string) (textImg *memdraw.Image, err error) {
+func Open(name string) (face font.Face, err error) {
+	if name == "" {
+		name = FontFile()
+	}
+
 	readFile := func(name string) ([]byte, error) {
 		return ioutil.ReadFile(filepath.FromSlash(path.Join(FontDir(), name)))
 	}
-	fontData, err := readFile(FontFile())
+	fontData, err := readFile(name)
 	if err != nil {
 		log.Fatal(err)
 	}
-	face, err := plan9font.ParseFont(fontData, readFile)
+	face, err = plan9font.ParseFont(fontData, readFile)
 	if err != nil {
 		log.Fatal(err)
+	}
+	return
+}
+
+func String(text string) (textImg *memdraw.Image, err error) {
+	face, err := Open("")
+	if err != nil {
+		return nil, fmt.Errorf("open font: %w", err)
 	}
 	ascent := face.Metrics().Ascent.Ceil()
 

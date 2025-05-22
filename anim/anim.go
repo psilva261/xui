@@ -5,11 +5,11 @@ import (
 	"9fans.net/go/draw/memdraw"
 	"image"
 	"time"
-	"xui"
-	"xui/events"
-	"xui/internal/color"
-	"xui/layout"
-	"xui/space"
+	"github.com/psilva261/xui"
+	"github.com/psilva261/xui/events"
+	"github.com/psilva261/xui/internal/color"
+	"github.com/psilva261/xui/layout"
+	"github.com/psilva261/xui/space"
 )
 
 type Interface interface {

@@ -3,10 +3,10 @@ package label
 import (
 	"9fans.net/go/draw/memdraw"
 	"image"
-	"xui/events"
-	"xui/internal/font"
-	"xui/layout"
-	"xui/space"
+	"github.com/psilva261/xui/events"
+	"github.com/psilva261/xui/font"
+	"github.com/psilva261/xui/layout"
+	"github.com/psilva261/xui/space"
 )
 
 type Interface interface {

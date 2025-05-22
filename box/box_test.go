@@ -6,11 +6,11 @@ import (
 	"image"
 	imagecolor "image/color"
 	"testing"
-	"xui/element"
-	"xui/internal/color"
-	"xui/label"
-	"xui/space"
-	"xui/xuitest"
+	"github.com/psilva261/xui/element"
+	"github.com/psilva261/xui/internal/color"
+	"github.com/psilva261/xui/label"
+	"github.com/psilva261/xui/space"
+	"github.com/psilva261/xui/xuitest"
 )
 
 func TestMarginPadding(t *testing.T) {

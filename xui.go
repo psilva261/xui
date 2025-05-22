@@ -1,7 +1,7 @@
 package xui
 
 import (
-	"xui/element"
+	"github.com/psilva261/xui/element"
 	"9fans.net/go/draw"
 	"9fans.net/go/draw/memdraw"
 	"fmt"
@@ -10,10 +10,10 @@ import (
 	"log"
 	"sync"
 	"time"
-	"xui/events/keyboard"
-	"xui/events/mouse"
-	//"xui/internal/color"
-	"xui/space"
+	"github.com/psilva261/xui/events/keyboard"
+	"github.com/psilva261/xui/events/mouse"
+	//"github.com/psilva261/xui/internal/color"
+	"github.com/psilva261/xui/space"
 )
 
 const (

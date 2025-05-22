@@ -7,12 +7,12 @@ import (
 	//"log"
 	"runtime"
 	"sync"
-	"xui/element"
-	"xui/events"
-	"xui/events/mouse"
-	"xui/internal/color"
-	"xui/layout"
-	"xui/space"
+	"github.com/psilva261/xui/element"
+	"github.com/psilva261/xui/events"
+	"github.com/psilva261/xui/events/mouse"
+	"github.com/psilva261/xui/internal/color"
+	"github.com/psilva261/xui/layout"
+	"github.com/psilva261/xui/space"
 )
 
 type Interface = element.Interface
@@ -110,7 +110,7 @@ func (b *Box) Render() *memdraw.Image {
 	ims := make([]*memdraw.Image, len(b.Elements))
 	wg := sync.WaitGroup{}
 	for i, el := range b.Elements {
-		if /* otherwise an error happens */false && runtime.GOARCH != "arm64" {
+		if false /* not working right now */ && runtime.GOARCH != "arm64" {
 			wg.Add(1)
 			go func(ii int) {
 				ims[ii] = el.Render() //b.boxImg, b.Rs[i].Min)

@@ -6,7 +6,7 @@ import (
 	"image"
 	"image/color"
 	"testing"
-	"xui/xuitest"
+	"github.com/psilva261/xui/xuitest"
 )
 
 func TestString(t *testing.T) {
