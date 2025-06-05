@@ -35,6 +35,9 @@ type Field struct {
 	Text string
 	color.Colorset
 
+	// Position of the cursor
+	Pos int
+
 	textImg *memdraw.Image
 	borderImg *memdraw.Image
 	hoverImg *memdraw.Image
@@ -76,15 +79,31 @@ func (f *Field) Event(ev events.Interface) {
 			f.cb(tev, f.cbUserData)
 		}
 	case keyboard.Event:
-		log.Printf("key pressed: %+v", tev)
+		log.Printf("key pressed: %+v %d % x", tev, tev, tev)
 
 		switch tev.Key {
 		case Backspace:
-			if len(f.Text) > 0 {
-				f.Text = f.Text[:len(f.Text)-1]
+			if f.Pos > 0 && len(f.Text) > 0 {
+				f.Text = f.Text[:f.Pos-1] + f.Text[f.Pos:]
 			}
+			f.Pos -= 1
+		case draw.KeyDelete:
+			if f.Pos < len(f.Text) {
+				f.Text = f.Text[:f.Pos] + f.Text[f.Pos+1:]
+			}
+		case draw.KeyLeft:
+			f.Pos -= 1
+		case draw.KeyRight:
+			f.Pos += 1
 		default:
 			f.Text += string([]byte{byte(tev.Key)})
+			f.Pos = len(f.Text)
+		}
+		if f.Pos < 0 {
+			f.Pos = 0
+		}
+		if f.Pos > len(f.Text) {
+			f.Pos = len(f.Text)
 		}
 		//log.Printf("event: call updateTextImgs")
 		f.updateTextImgs()
@@ -138,7 +157,12 @@ func (f *Field) updateTextImgs() {
 	f.hoverImg.Draw(rr, f.textImg, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
 	geom.DrawRoundedBorder(f.hoverImg, f.Rectangle, f.Colorset.Hover.Border)
 
-	geom.DrawCursor(f.hoverImg, r, f.textImg, f.Colorset.Hover.Border)
+	textPart, err := font.String(f.Text[:f.Pos])
+	if err == nil {
+		geom.DrawCursor(f.hoverImg, r, textPart.R, f.Colorset.Hover.Border)
+	} else {
+		log.Printf("font string sub text: %v", err)
+	}
 }
 
 func (f Field) Focus() {

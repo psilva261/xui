@@ -9,17 +9,34 @@ import (
 	"testing"
 )
 
-func TestRender(t *testing.T) {
+var rField = image.Rect(0, 0, 300, 100)
+
+func newField(t *testing.T) *Field {
 	memdraw.Init()
 	rScreen := image.Rect(0, 0, 800, 600)
-	rField := image.Rect(0, 0, 300, 100)
 	img, err := memdraw.AllocImage(rScreen, draw.ABGR32)
 	if err != nil {
 		t.Fail()
 	}
 	memdraw.FillColor(img, draw.White)
-	f := New(&xuitest.Xui{}, image.ZP, "", rField)
+	return New(&xuitest.Xui{}, image.ZP, "", rField)
+}
 
+func TestEvent(t *testing.T) {
+	f := newField(t)
+	f.Text = "Text"
+	f.Pos = 2
+	f.Event(keyboard.Event{Key: Backspace})
+	if f.Text != "Txt" {
+		t.Fatalf("Text=%s", f.Text)
+	}
+	if f.Pos != 1 {
+		t.Fatalf("Pos=%d", f.Pos)
+	}
+}
+
+func TestRender(t *testing.T) {
+	f := newField(t)
 	for i := 0; i < 20; i++ {
 		f.Event(keyboard.Event{Key: 'a'})
 		img := f.Render()

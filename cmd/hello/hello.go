@@ -80,7 +80,7 @@ func Main() (err error) {
 	}, nil)
 	btn.Margin = x.Space(5, 10)
 
-	fl := field.New(x, image.ZP, " ", x.Rect(0,0, 150, 50))
+	fl := field.New(x, image.ZP, "", x.Rect(0,0, 150, 50))
 	fl.Margin = x.Space(5, 10)
 	b2 := box.New([]element.Interface{
 		l,

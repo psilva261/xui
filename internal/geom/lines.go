@@ -48,9 +48,9 @@ func DrawRoundedBorder(img *memdraw.Image, r image.Rectangle, color *memdraw.Ima
 	memdraw.Line(img, image.Pt(x1-radius, y0), image.Pt(x0+radius, y0), 0, 0, 0, color, image.ZP, draw.SoverD)
 }
 
-func DrawCursor(dst *memdraw.Image, bounds image.Rectangle, text *memdraw.Image, color *memdraw.Image) {
-	h := text.R.Dy()/2
-	p1 := text.R.Max.Add(image.Pt(h/5, -h/2))
+func DrawCursor(dst *memdraw.Image, bounds, textR image.Rectangle, color *memdraw.Image) {
+	h := textR.Dy()/2
+	p1 := textR.Max.Add(image.Pt(h/5, -h/2))
 	p0 := p1.Add(image.Pt(0, -h))
 	if p0.X >= bounds.Dx() {
 		return
