@@ -35,7 +35,7 @@ func TestStringEmpty(t *testing.T) {
 }
 
 func testString(t *testing.T, text string) (map[color.Color]int, image.Rectangle) {
-	img, err := String(text)
+	img, err := String(text, nil)
 	if err != nil {
 		t.Fail()
 	}

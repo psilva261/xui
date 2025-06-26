@@ -27,7 +27,7 @@ func New(orig image.Point, text string) (l Label) {
 	l.Text = text
 
 	var err error
-	l.textImg, err = font.String(text)
+	l.textImg, err = font.String(text, nil)
 	if err != nil {
 		panic(err.Error())
 	}

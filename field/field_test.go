@@ -4,6 +4,7 @@ import (
 	"9fans.net/go/draw"
 	"9fans.net/go/draw/memdraw"
 	"github.com/psilva261/xui/events/keyboard"
+	"github.com/psilva261/xui/events/mouse"
 	"github.com/psilva261/xui/xuitest"
 	"image"
 	"testing"
@@ -32,6 +33,20 @@ func TestEvent(t *testing.T) {
 	}
 	if f.Pos != 1 {
 		t.Fatalf("Pos=%d", f.Pos)
+	}
+}
+
+func TestEventClick(t *testing.T) {
+	f := newField(t)
+	f.Text = "abcdefghijklmn"
+	f.Pos = 13
+	f.Offsets = []int{0, 19, 40, 57, 78, 96, 108, 129, 150, 159, 169, 189, 198, 229, 250}
+	f.Event(mouse.Event{
+		Type: mouse.Click,
+		Point: image.Pt(82,423),
+	})
+	if f.Pos != 5 {
+		t.Fatalf("%v", f.Pos)
 	}
 }
 

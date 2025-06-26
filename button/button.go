@@ -44,7 +44,7 @@ func New(x xui.Interface, orig image.Point, text string) (b *Button) {
 	b.x = x
 
 	var err error
-	b.textImg, err = font.String(text)
+	b.textImg, err = font.String(text, nil)
 	if err != nil {
 		panic(err.Error())
 	}

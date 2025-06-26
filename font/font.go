@@ -34,7 +34,7 @@ func Open(name string) (face font.Face, err error) {
 	return
 }
 
-func String(text string) (textImg *memdraw.Image, err error) {
+func String(text string, offsets *[]int) (textImg *memdraw.Image, err error) {
 	face, err := Open("")
 	if err != nil {
 		return nil, fmt.Errorf("open font: %w", err)
@@ -42,10 +42,16 @@ func String(text string) (textImg *memdraw.Image, err error) {
 	ascent := face.Metrics().Ascent.Ceil()
 
 	w := 0
-	for _, r := range text {
+	if offsets != nil && len(*offsets) <= len(text) {
+		*offsets = append(*offsets, make([]int, len(text)-len(*offsets)+1)...)
+	}
+	for i, r := range text {
 		bounds, adv, _ := face.GlyphBounds(r)
 		_ = bounds
 		w += adv.Ceil()
+		if offsets != nil {
+			(*offsets)[i+1] = w
+		}
 	}
 	r := image.Rect(0, 0, w, 2*ascent)
 	if r.Dx() == 0 {
@@ -64,7 +70,7 @@ func String(text string) (textImg *memdraw.Image, err error) {
 	}
 	d.DrawString(text)
 
-	log.Printf("String: dst.Bounds()=%+v", dst.Bounds())
+	//log.Printf("String: dst.Bounds()=%+v", dst.Bounds())
 
 	textImg, err = memdraw.AllocImage(dst.Bounds(), draw.ABGR32)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	//"fmt"
 	"image"
 	"log"
+	"slices"
 	"sync"
 	"github.com/psilva261/xui"
 	"github.com/psilva261/xui/events"
@@ -38,6 +39,9 @@ type Field struct {
 	// Position of the cursor
 	Pos int
 
+	// Offsets of the characters
+	Offsets []int
+
 	textImg *memdraw.Image
 	borderImg *memdraw.Image
 	hoverImg *memdraw.Image
@@ -69,21 +73,25 @@ func (f *Field) Event(ev events.Interface) {
 
 	switch tev := ev.(type) {
 	case mouse.Event:
-		if tev.Type == mouse.Enter {
+		switch tev.Type {
+		case mouse.Enter:
 			f.hover = true
-		} else if tev.Type == mouse.Leave {
+		case mouse.Leave:
 			f.hover = false
+		case mouse.Click:
+			f.Pos, _ = slices.BinarySearch(f.Offsets, tev.Point.X)
+			f.updateTextImgs()
 		}
 
 		if f.cb != nil {
 			f.cb(tev, f.cbUserData)
 		}
 	case keyboard.Event:
-		log.Printf("key pressed: %+v %d % x", tev, tev, tev)
+		//log.Printf("key pressed: %+v %d % x", tev, tev, tev)
 
 		switch tev.Key {
 		case Backspace:
-			if f.Pos > 0 && len(f.Text) > 0 {
+			if f.Pos > 0 && f.Pos <= len(f.Text) && len(f.Text) > 0 {
 				f.Text = f.Text[:f.Pos-1] + f.Text[f.Pos:]
 			}
 			f.Pos -= 1
@@ -96,8 +104,8 @@ func (f *Field) Event(ev events.Interface) {
 		case draw.KeyRight:
 			f.Pos += 1
 		default:
-			f.Text += string([]byte{byte(tev.Key)})
-			f.Pos = len(f.Text)
+			f.Text = f.Text[:f.Pos]+string([]byte{byte(tev.Key)})+f.Text[f.Pos:]
+			f.Pos += 1
 		}
 		if f.Pos < 0 {
 			f.Pos = 0
@@ -127,10 +135,9 @@ func (f *Field) Render() *memdraw.Image {
 }
 
 func (f *Field) updateTextImgs() {
-
 	var err error
-	//log.Printf("updateTextImgs: call font.String")
-	f.textImg, err = font.String(f.Text)
+
+	f.textImg, err = font.String(f.Text, &f.Offsets)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -157,9 +164,13 @@ func (f *Field) updateTextImgs() {
 	f.hoverImg.Draw(rr, f.textImg, image.ZP, color.EmptyMask, image.ZP, draw.SoverD)
 	geom.DrawRoundedBorder(f.hoverImg, f.Rectangle, f.Colorset.Hover.Border)
 
-	textPart, err := font.String(f.Text[:f.Pos])
+	pos := f.Pos
+	if pos+1 >= len(f.Offsets) {
+		pos = len(f.Offsets)-1
+	}
+	textPartR := draw.Rect(0, 0, f.Offsets[pos], f.textImg.R.Dy())
 	if err == nil {
-		geom.DrawCursor(f.hoverImg, r, textPart.R, f.Colorset.Hover.Border)
+		geom.DrawCursor(f.hoverImg, r, textPartR, f.Colorset.Hover.Border)
 	} else {
 		log.Printf("font string sub text: %v", err)
 	}
