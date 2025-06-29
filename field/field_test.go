@@ -45,7 +45,7 @@ func TestEventClick(t *testing.T) {
 		Type: mouse.Click,
 		Point: image.Pt(82,423),
 	})
-	if f.Pos != 5 {
+	if f.Pos != 4 {
 		t.Fatalf("%v", f.Pos)
 	}
 }

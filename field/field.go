@@ -80,6 +80,7 @@ func (f *Field) Event(ev events.Interface) {
 			f.hover = false
 		case mouse.Click:
 			f.Pos, _ = slices.BinarySearch(f.Offsets, tev.Point.X)
+			f.Pos = slices.Max([]int{0, f.Pos-1})
 			f.updateTextImgs()
 		}
 

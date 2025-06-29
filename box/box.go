@@ -68,11 +68,16 @@ func (b *Box) Event(evOrig events.Interface) {
 		b.mouseXY = mev.Point
 	}
 	for i, el := range b.Elements {
+		elR, elMargin := el.Geom()
+
 		switch tevOrig := evOrig.(type) {
 		case mouse.Event:
 			var ev mouse.Event
 
-			ev.Point = tevOrig.Point
+			ev.Point = tevOrig.Point.
+			  Sub(b.Padding.TopLeft()).
+			  Sub(elR.Min).
+			  Sub(elMargin.TopLeft())
 			ev.Buttons = tevOrig.Buttons
 			ev.Msec = tevOrig.Msec
 
