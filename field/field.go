@@ -38,6 +38,8 @@ type Field struct {
 
 	// Position of the cursor
 	Pos int
+	// Position of the selection
+	Pos2 int
 
 	// Offsets of the characters
 	Offsets []int
@@ -78,10 +80,21 @@ func (f *Field) Event(ev events.Interface) {
 			f.hover = true
 		case mouse.Leave:
 			f.hover = false
-		case mouse.Click:
+		case mouse.Down:
 			f.Pos, _ = slices.BinarySearch(f.Offsets, tev.Point.X)
 			f.Pos = slices.Max([]int{0, f.Pos-1})
 			f.updateTextImgs()
+			//log.Printf("f.Pos=%d", f.Pos)
+		case mouse.Up:
+			f.Pos2, _ = slices.BinarySearch(f.Offsets, tev.Point.X)
+			if f.Pos2 < f.Pos {
+				f.Pos2, f.Pos = f.Pos, f.Pos2
+			}
+			f.Pos2 = clamp(0, f.Pos2-1, len(f.Text)-1)
+			f.Pos2 = slices.Max([]int{0, f.Pos2-1})
+			//log.Printf("f.Pos2=%d", f.Pos2)
+			//log.Printf("selected %d/%d: %s", f.Pos, f.Pos2, f.Text[f.Pos:f.Pos2+1])
+			//f.updateTextImgs()
 		}
 
 		if f.cb != nil {
@@ -117,6 +130,12 @@ func (f *Field) Event(ev events.Interface) {
 		//log.Printf("event: call updateTextImgs")
 		f.updateTextImgs()
 	}
+}
+
+func clamp(a, x, b int) int {
+	x = slices.Min([]int{x, b})
+	x = slices.Max([]int{a, x})
+	return x
 }
 
 func (f *Field) Render() *memdraw.Image {

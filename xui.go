@@ -152,6 +152,7 @@ func (x *Xui) Loop() {
 			})()
 		}
 	}()
+	btns := 0
 	for {
 		select {
 		case m := <-x.mousectl.C:
@@ -167,8 +168,13 @@ func (x *Xui) Loop() {
 				var ev mouse.Event
 
 				if m.Buttons&1 > 0 {
+					if btns&1 == 0 {
+						ev.Type |= mouse.Down
+					}
+				} else if btns&1 > 0 {
 					ev.Type |= mouse.Click
 				}
+				btns = m.Buttons
 
 
 				if x.root != nil {
@@ -183,7 +189,7 @@ func (x *Xui) Loop() {
 				x.mu.Lock()
 				defer x.mu.Unlock()
 
-				log.Printf("KEY %v", k)
+				//log.Printf("KEY %v", k)
 
 				ev := keyboard.Event{}
 				ev.Type = keyboard.Pressed

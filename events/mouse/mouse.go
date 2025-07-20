@@ -8,7 +8,10 @@ const (
 	Enter Type = 1 << iota
 	Leave
 	Click
+	Down
 )
+
+const Up = Click
 
 // Mouse Point in local coordinates though
 //
